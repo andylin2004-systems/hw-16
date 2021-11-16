@@ -1,14 +1,22 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <time.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <fcntl.h>
+
+unsigned int randomNum(){
+    unsigned int random;
+    FILE *file = open("/dev/random", O_RDONLY, 0644);
+    read(file, &random, 4);
+    return random;
+}
 
 int child(){
     printf("Child PID: %d\n", getpid());
-    int sleepTime = (rand() % 4) + 2;
+    int sleepTime = (randomNum() % 4) + 2;
+    printf("%d\n", sleepTime);
     sleep(sleepTime);
-    printf("Child PID: %d finished\n", getpid());
+    printf("Child PID %d finished\n", getpid());
     return sleepTime;
 }
 
@@ -20,7 +28,6 @@ void parent(){
 }
 
 int main(){
-    srand(time(NULL));
     printf("Forking PID: %d\n", getpid());
     int fork1 = fork();
     if (fork1){
